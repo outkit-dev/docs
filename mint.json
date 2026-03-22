@@ -1,0 +1,28 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Outkit",
+  "colors": {
+    "primary": "#000000",
+    "light": "#111827",
+    "dark": "#ffffff"
+  },
+  "topbarLinks": [
+    {
+      "name": "Website",
+      "url": "https://outkit.dev"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://app.outkit.dev"
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "docs/introduction",
+        "docs/quickstart"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+---
+title: "Quickstart"
+description: "Start building with Outkit in minutes"
+---
+
+Follow these steps to get your first integration up and running.
+
+## 1. Create an API Key
+
+First, you'll need an account to generate API credentials.
+
+<Steps>
+  <Step title="Sign Up">
+    Head over to [app.outkit.dev](https://app.outkit.dev) and create an account.
+  </Step>
+  <Step title="Navigate to Developers">
+    Go to your settings and click on the **API Keys** section.
+  </Step>
+  <Step title="Copy your Key">
+    Click **Generate Key** and save it somewhere secure. You won't be able to see it again.
+  </Step>
+</Steps>
+
+## 2. Make your first request
+
+You can test your API key against our endpoint using cURL:
+
+```bash
+curl --request GET \
+  --url https://api.outkit.dev/v1/health \
+  --header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+If everything is configured correctly, you'll see a successful `200 OK` response!
