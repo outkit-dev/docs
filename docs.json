@@ -10,7 +10,7 @@
   "colors": {
     "primary": "#ff80b5",
     "light": "#b30069",
-    "dark": "#ff80b5",
+    "dark": "#ff80b5"
   },
   "backgroundImage": "https://raw.githubusercontent.com/mintlify/themes/main/backgrounds/glow.svg",
   "navbar": {
