@@ -11,10 +11,6 @@
     "primary": "#ff80b5",
     "light": "#b30069",
     "dark": "#ff80b5",
-    "background": {
-      "light": "#FAFAF8",
-      "dark": "#0d0d0d"
-    }
   },
   "backgroundImage": "https://raw.githubusercontent.com/mintlify/themes/main/backgrounds/glow.svg",
   "navbar": {
