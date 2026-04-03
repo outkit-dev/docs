@@ -1,34 +1,129 @@
 ---
 title: "Quickstart"
-description: "Start building with Outkit in minutes"
+description: "Start enhancing AI output in under 5 minutes"
 ---
 
-Follow these steps to get your first integration up and running.
+Get your first AI response enhanced with Outkit — choose the path that fits your setup.
 
-## 1. Create an API Key
-
-First, you'll need an account to generate API credentials.
+## 1. Get Your API Key
 
 <Steps>
-  <Step title="Sign Up">
-    Head over to [app.outkit.dev](https://app.outkit.dev) and create an account.
+  <Step title="Sign up">
+    Create an account at [app.outkit.dev](https://app.outkit.dev).
   </Step>
-  <Step title="Navigate to Developers">
-    Go to your settings and click on the **API Keys** section.
+  <Step title="Create a Profile">
+    Navigate to **Profiles** and create a new profile. Profiles are tied to a design — you can start with Outkit's default design or customize it to match your application's design language.
   </Step>
-  <Step title="Copy your Key">
-    Click **Generate Key** and save it somewhere secure. You won't be able to see it again.
+  <Step title="Generate a key">
+    Inside your profile, click **Generate API Key**. Copy and save it — you won't see it again. Every API key is scoped to the profile it was created in.
   </Step>
 </Steps>
 
-## 2. Make your first request
+## 2. Choose Your Integration
 
-You can test your API key against our endpoint using cURL:
+<Tabs>
+  <Tab title="REST API">
+    Call the Outkit API directly from any language or framework.
 
-```bash
-curl --request GET \
-  --url https://api.outkit.dev/v1/health \
-  --header 'Authorization: Bearer YOUR_API_KEY'
-```
+    ### Enhance a response
 
-If everything is configured correctly, you'll see a successful `200 OK` response!
+    ```bash
+    curl -X POST https://api.outkit.dev/enhance \
+      -H "Content-Type: application/json" \
+      -H "x-outkit-api-key: your-api-key" \
+      -d '{
+        "content": "PostgreSQL is relational with full ACID compliance.\n\n| Feature | PostgreSQL | MongoDB |\n|---------|-----------|---------|  \n| Data Model | Relational | Document |\n| ACID | Full | Multi-doc since 4.0 |\n\n**Important:** For payments, PostgreSQL ACID guarantees are non-negotiable.",
+        "context": "User comparing databases for e-commerce"
+      }'
+    ```
+
+    The API returns structured `ContentBlock[]` with component types, typed props, and fallback text:
+
+    ```json
+    {
+      "blocks": [
+        { "type": "text", "content": "PostgreSQL is relational..." },
+        { "type": "component", "component": "table", "version": "1.0",
+          "props": {
+            "columns": ["Feature", "PostgreSQL", "MongoDB"],
+            "rows": [...]
+          }
+        },
+        { "type": "component", "component": "alert", "version": "1.0",
+          "props": {
+            "variant": "warning",
+            "title": "Payment Data Integrity",
+            "message": "For payments, PostgreSQL ACID guarantees are non-negotiable."
+          }
+        }
+      ]
+    }
+    ```
+
+    <Card title="Full API Reference" icon="arrow-right" href="/docs/api/overview">
+      Explore all endpoints, streaming, and response schemas.
+    </Card>
+  </Tab>
+  <Tab title="MCP Server">
+    The MCP server works with Claude Desktop, Cursor, Windsurf, and any MCP-compatible client.
+
+    ### Install
+
+    Add Outkit to your MCP client configuration:
+
+    ```json
+    {
+      "mcpServers": {
+        "outkit": {
+          "command": "npx",
+          "args": ["-y", "@outkit/mcp-server"],
+          "env": {
+            "OUTKIT_API_KEY": "your-api-key"
+          }
+        }
+      }
+    }
+    ```
+
+    ### Try it
+
+    Once configured, your AI assistant can use Outkit tools automatically. Try a prompt like:
+
+    > "Compare PostgreSQL and MongoDB for my e-commerce startup, then use outkit to enhance the response"
+
+    The assistant will call `outkit_enhance` and return structured components — tables, alerts, checklists — instead of plain text.
+
+    <Card title="Full MCP Guide" icon="arrow-right" href="/docs/mcp/overview">
+      Learn about all MCP tools, configuration options, and streaming.
+    </Card>
+  </Tab>
+</Tabs>
+
+## 3. Verify It Works
+
+<Steps>
+  <Step title="Check available components">
+    ```bash
+    curl https://api.outkit.dev/components \
+      -H "x-outkit-api-key: your-api-key"
+    ```
+    Returns all component types your plan supports.
+  </Step>
+</Steps>
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools Reference" icon="plug" href="/docs/mcp/tools">
+    Deep dive into `outkit_enhance` and `outkit_list_components`.
+  </Card>
+  <Card title="API Endpoints" icon="code" href="/docs/api/enhance">
+    Full request/response reference for the REST API.
+  </Card>
+  <Card title="Components" icon="grid-2" href="/docs/components">
+    Browse all 45+ component types with prop schemas.
+  </Card>
+  <Card title="Examples" icon="eye" href="/docs/examples">
+    Real-world input/output examples.
+  </Card>
+</CardGroup>

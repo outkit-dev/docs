@@ -1,32 +1,72 @@
 ---
 title: Introduction
-description: "Welcome to the official Outkit documentation"
+description: "Transform raw AI text into rich, interactive UI components"
 ---
 
-Welcome to Outkit! This is where you can learn how to integrate and build with our platform.
+Outkit transforms raw AI text responses into structured, interactive UI components. Instead of showing users walls of markdown, Outkit automatically detects tables, charts, checklists, alerts, and 40+ other component types in your AI output — and returns structured data your frontend can render beautifully.
 
-## Overview
+**One line of code. 10x better AI output.**
 
-Outkit provides developers with powerful tools to... *(Add your core product pitch here)*.
+```jsx
+// Before — plain markdown
+<Markdown>{aiResponse}</Markdown>
 
-## Important Links
+// After — rich interactive components
+<AIRenderer content={aiResponse} />
+```
 
-* [Get Started](https://app.outkit.dev)
-* [Website](https://outkit.dev)
+## How It Works
+
+Outkit is a **post-processing layer**. It doesn't proxy your LLM calls or touch your tokens. Your agents, orchestration, and API keys stay untouched. At the very end, when you have a response meant for a human, you pass it through Outkit.
+
+1. **Your LLM generates a response** — any model, any provider, any framework
+2. **Outkit understands the response** — detects structure like comparisons, metrics, steps, timelines
+3. **Outkit extracts structured props** — returns typed component data (table columns/rows, chart datasets, checklist items)
+4. **Your frontend renders rich UI** — using Outkit's renderer or your own components
+
+The entire process adds ~500ms and costs fractions of a cent per call.
+
+## Two Ways to Integrate
 
 <CardGroup cols={2}>
   <Card
-    title="Quickstart Guide"
+    title="MCP Server"
+    icon="plug"
+    href="/docs/mcp/overview"
+  >
+    Drop-in integration for Claude Desktop, Cursor, Windsurf, and any MCP-compatible AI client.
+  </Card>
+  <Card
+    title="REST API"
+    icon="code"
+    href="/docs/api/overview"
+  >
+    Direct HTTP integration for custom applications, backends, and AI pipelines.
+  </Card>
+</CardGroup>
+
+## Quick Links
+
+<CardGroup cols={3}>
+  <Card
+    title="Quickstart"
     icon="rocket"
     href="/docs/quickstart"
   >
-    Get up and running with Outkit in under 5 minutes.
+    Get running in under 5 minutes.
   </Card>
   <Card
-    title="API Reference"
-    icon="code"
-    href="/docs/api-reference"
+    title="Components"
+    icon="grid-2"
+    href="/docs/components"
   >
-    Explore our comprehensive API endpoints.
+    Explore the 45+ component types Outkit can generate.
+  </Card>
+  <Card
+    title="Examples"
+    icon="eye"
+    href="/docs/examples"
+  >
+    See real input/output examples.
   </Card>
 </CardGroup>

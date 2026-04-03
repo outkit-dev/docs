@@ -1,0 +1,210 @@
+---
+title: "POST /enhance"
+description: "Transform AI text into structured UI components"
+---
+
+The core endpoint. Sends raw AI text and receives structured `ContentBlock[]` — tables, charts, alerts, checklists, and more.
+
+## Request
+
+<ParamField body="content" type="string" required>
+  The full AI text response to enhance. Can include markdown formatting.
+</ParamField>
+
+<ParamField body="context" type="string">
+  The user's original prompt or conversation context. Improves classification accuracy — helps distinguish, for example, a comparison table from raw data.
+</ParamField>
+
+<ParamField body="preferences" type="object">
+  Optional hints to control enhancement behavior.
+
+  <Expandable title="Preferences fields">
+    <ParamField body="preferences.preferredTypes" type="string[]">
+      Component types to prefer when ambiguous. Values must be valid component keys from [`GET /components`](/docs/api/components).
+    </ParamField>
+    <ParamField body="preferences.maxComponents" type="integer">
+      Maximum number of components to generate. Excess segments become text blocks with fallback.
+    </ParamField>
+    <ParamField body="preferences.density" type="string" default="normal">
+      Layout density. One of `"normal"`, `"compact"`, or `"spacious"`.
+    </ParamField>
+    <ParamField body="preferences.fallbackPolicy" type="string" default="on_fail">
+      When to include fallback markdown. `"on_fail"` includes it only on component blocks; `"always"` includes it on every block.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField query="stream" type="boolean" default="true">
+  When `true` (default), returns Server-Sent Events (SSE). When `false`, returns a single JSON response after processing completes.
+</ParamField>
+
+## Response (JSON mode)
+
+Set `?stream=false` to get a single JSON response:
+
+```bash
+curl -X POST "https://api.outkit.dev/enhance?stream=false" \
+  -H "Content-Type: application/json" \
+  -H "x-outkit-api-key: your-api-key" \
+  -d '{
+    "content": "Here are the top 3 frameworks:\n\n| Framework | Stars | Language |\n|-----------|-------|----------|\n| React | 220k | JavaScript |\n| Vue | 207k | JavaScript |\n| Svelte | 78k | JavaScript |\n\n**Tip:** Svelte has the smallest bundle size.",
+    "context": "User asked about frontend frameworks"
+  }'
+```
+
+### Response Body
+
+```json
+{
+  "blocks": [
+    {
+      "type": "text",
+      "content": "Here are the top 3 frameworks:"
+    },
+    {
+      "type": "skeleton",
+      "component": "table",
+      "rows": 3
+    },
+    {
+      "type": "component",
+      "component": "table",
+      "version": "1.0",
+      "props": {
+        "columns": ["Framework", "Stars", "Language"],
+        "rows": [
+          { "Framework": "React", "Stars": "220k", "Language": "JavaScript" },
+          { "Framework": "Vue", "Stars": "207k", "Language": "JavaScript" },
+          { "Framework": "Svelte", "Stars": "78k", "Language": "JavaScript" }
+        ],
+        "sortable": true
+      },
+      "meta": { "confidence": 0.95 },
+      "fallback": "| Framework | Stars | Language |..."
+    },
+    {
+      "type": "skeleton",
+      "component": "alert"
+    },
+    {
+      "type": "component",
+      "component": "alert",
+      "version": "1.0",
+      "props": {
+        "variant": "tip",
+        "message": "Svelte has the smallest bundle size."
+      },
+      "meta": { "confidence": 0.90 }
+    }
+  ],
+  "debug": {
+    "componentsDetected": 2,
+    "processingTimeMs": 1850,
+    "provider": "gemini",
+    "classifications": [
+      { "component": "table", "confidence": 0.95, "sourceRange": [0, 0] },
+      { "component": "alert", "confidence": 0.90, "sourceRange": [0, 0] }
+    ]
+  }
+}
+```
+
+## Response (Streaming mode)
+
+With streaming enabled (the default), the response is delivered as Server-Sent Events:
+
+```bash
+curl -X POST "https://api.outkit.dev/enhance" \
+  -H "Content-Type: application/json" \
+  -H "x-outkit-api-key: your-api-key" \
+  -d '{ "content": "..." }'
+```
+
+```
+data: {"type":"text","content":"Here are the top 3 frameworks:"}
+
+data: {"type":"skeleton","component":"table","rows":3}
+
+data: {"type":"component","component":"table","version":"1.0","props":{...}}
+
+data: {"type":"skeleton","component":"alert"}
+
+data: {"type":"component","component":"alert","version":"1.0","props":{...}}
+
+data: [DONE]
+```
+
+Each `data:` line contains a single `ContentBlock` as JSON. The stream ends with `data: [DONE]`.
+
+### Why Streaming?
+
+Streaming lets you render content progressively:
+
+1. **TextBlock** arrives → render text immediately
+2. **SkeletonBlock** arrives → show a loading placeholder for the upcoming component
+3. **ComponentBlock** arrives → swap the skeleton with the fully rendered component
+
+This creates a smooth, progressive loading experience even for complex responses.
+
+## ContentBlock Schema
+
+Every response contains an ordered array of blocks. See [ContentBlock reference](/docs/api/content-blocks) for the full schema of each block type.
+
+## Code Examples
+
+<CodeGroup>
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.outkit.dev/enhance",
+    params={"stream": "false"},
+    headers={
+        "Content-Type": "application/json",
+        "x-outkit-api-key": "your-api-key",
+    },
+    json={
+        "content": ai_response_text,
+        "context": user_prompt,
+    },
+)
+
+blocks = response.json()["blocks"]
+
+for block in blocks:
+    if block["type"] == "text":
+        render_markdown(block["content"])
+    elif block["type"] == "component":
+        render_component(block["component"], block["props"])
+```
+
+```typescript TypeScript
+const response = await fetch(
+  "https://api.outkit.dev/enhance?stream=false",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-outkit-api-key": process.env.OUTKIT_API_KEY!,
+    },
+    body: JSON.stringify({
+      content: aiResponseText,
+      context: userPrompt,
+    }),
+  }
+);
+
+const { blocks } = await response.json();
+
+for (const block of blocks) {
+  switch (block.type) {
+    case "text":
+      renderMarkdown(block.content);
+      break;
+    case "component":
+      renderComponent(block.component, block.props);
+      break;
+  }
+}
+```
+</CodeGroup>

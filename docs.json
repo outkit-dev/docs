@@ -34,6 +34,29 @@
           "docs/introduction",
           "docs/quickstart"
         ]
+      },
+      {
+        "group": "MCP Server",
+        "pages": [
+          "docs/mcp/overview",
+          "docs/mcp/tools"
+        ]
+      },
+      {
+        "group": "REST API",
+        "pages": [
+          "docs/api/overview",
+          "docs/api/enhance",
+          "docs/api/components",
+          "docs/api/content-blocks"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "docs/components",
+          "docs/examples"
+        ]
       }
     ]
   }

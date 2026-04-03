@@ -1,0 +1,131 @@
+---
+title: "MCP Overview"
+description: "Use Outkit with Claude Desktop, Cursor, Windsurf, and any MCP-compatible client"
+---
+
+The Outkit MCP server lets AI assistants enhance their text responses into rich UI components. It works with any client that supports the [Model Context Protocol](https://modelcontextprotocol.io/) — including Claude Desktop, Cursor, Windsurf, and VS Code.
+
+## What You Get
+
+When the MCP server is configured, your AI assistant gains two tools:
+
+| Tool | Purpose | LLM Call? |
+|------|---------|-----------|
+| `outkit_enhance` | Transforms text into structured UI components | Yes (~500ms) |
+| `outkit_list_components` | Lists available component types | No |
+
+The assistant can call `outkit_enhance` on its own responses to return tables, charts, checklists, alerts, and 40+ other interactive component types instead of plain markdown.
+
+## Installation
+
+### Prerequisites
+
+- An Outkit API key ([get one here](https://app.outkit.dev))
+- Node.js 18+ installed
+- An MCP-compatible AI client
+
+### Configuration
+
+Add the Outkit server to your MCP client config:
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+    ```json
+    {
+      "mcpServers": {
+        "outkit": {
+          "command": "npx",
+          "args": ["-y", "@outkit/mcp-server"],
+          "env": {
+            "OUTKIT_API_KEY": "your-api-key"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Cursor">
+    Add to your Cursor MCP settings (`.cursor/mcp.json` in your project or global config):
+
+    ```json
+    {
+      "mcpServers": {
+        "outkit": {
+          "command": "npx",
+          "args": ["-y", "@outkit/mcp-server"],
+          "env": {
+            "OUTKIT_API_KEY": "your-api-key"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windsurf">
+    Add to your Windsurf MCP config (`~/.codeium/windsurf/mcp_config.json`):
+
+    ```json
+    {
+      "mcpServers": {
+        "outkit": {
+          "command": "npx",
+          "args": ["-y", "@outkit/mcp-server"],
+          "env": {
+            "OUTKIT_API_KEY": "your-api-key"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="VS Code">
+    Add to your VS Code settings (`.vscode/mcp.json`):
+
+    ```json
+    {
+      "servers": {
+        "outkit": {
+          "command": "npx",
+          "args": ["-y", "@outkit/mcp-server"],
+          "env": {
+            "OUTKIT_API_KEY": "your-api-key"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+Restart your AI client after saving. The Outkit tools should appear in the tool list.
+
+## How It Works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│  AI Client   │────▶│ Outkit MCP   │────▶│  Outkit API  │
+│ (Claude,     │◀────│   Server     │◀────│   (Cloud)    │
+│  Cursor...)  │     └──────────────┘     └──────────────┘
+└─────────────┘
+        │
+   1. Assistant generates text response
+   2. Calls outkit_enhance with the text
+   3. MCP server sends to Outkit API
+   4. Returns structured ContentBlock[]
+   5. Assistant presents rich components
+```
+
+The MCP server is a thin client — it forwards requests to the Outkit API and returns structured component data. No LLM keys or model configuration needed on the MCP side.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Tools Reference" icon="wrench" href="/docs/mcp/tools">
+    Detailed reference for `outkit_enhance` and `outkit_list_components`.
+  </Card>
+  <Card title="Examples" icon="eye" href="/docs/examples">
+    See real input/output examples with the MCP server.
+  </Card>
+</CardGroup>

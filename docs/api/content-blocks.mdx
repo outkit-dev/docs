@@ -1,0 +1,97 @@
+---
+title: "ContentBlock Reference"
+description: "Schema reference for all block types returned by the API"
+---
+
+Every response from `/enhance` contains an ordered array of `ContentBlock` objects. There are three block types.
+
+## TextBlock
+
+Plain text or markdown content that doesn't map to a structured component.
+
+```json
+{
+  "type": "text",
+  "content": "PostgreSQL and MongoDB are both excellent databases..."
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | `"text"` | Always `"text"` |
+| `content` | `string` | Markdown-formatted text |
+
+## SkeletonBlock
+
+A loading placeholder emitted **immediately before** its matching `ComponentBlock`. Use it to show a shimmer or skeleton UI while waiting for the full component.
+
+```json
+{
+  "type": "skeleton",
+  "component": "table",
+  "rows": 4,
+  "lines": 4
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | `"skeleton"` | Always `"skeleton"` |
+| `component` | `string` | The component type that follows (e.g. `"table"`, `"alert"`) |
+| `rows` | `number?` | Hint for table/list placeholder height |
+| `lines` | `number?` | Hint for card/text placeholder height |
+
+## ComponentBlock
+
+A fully structured UI component with typed props, ready for rendering.
+
+```json
+{
+  "type": "component",
+  "component": "table",
+  "version": "1.0",
+  "props": {
+    "columns": ["Feature", "PostgreSQL", "MongoDB"],
+    "rows": [
+      { "Feature": "Data Model", "PostgreSQL": "Relational", "MongoDB": "Document" }
+    ],
+    "sortable": true
+  },
+  "meta": {
+    "title": "Database Comparison",
+    "description": "Feature comparison between PostgreSQL and MongoDB",
+    "confidence": 0.95
+  },
+  "fallback": "| Feature | PostgreSQL | MongoDB |..."
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | `"component"` | Always `"component"` |
+| `component` | `string` | Component type key (e.g. `"table"`, `"alert"`, `"checkbox"`) |
+| `version` | `string` | Schema version. Currently `"1.0"` |
+| `props` | `object` | Component-specific structured data. See [Components](/docs/components) |
+| `meta` | `object?` | Optional metadata |
+| `meta.title` | `string?` | Component title |
+| `meta.description` | `string?` | Component description |
+| `meta.confidence` | `number?` | Classification confidence (0–1) |
+| `fallback` | `string?` | Original markdown text. Use this if the component fails to render |
+
+## Ordering Guarantee
+
+Blocks always appear in document order (matching the original text flow). Every `ComponentBlock` is preceded by a matching `SkeletonBlock`:
+
+```
+TextBlock
+SkeletonBlock("table")
+ComponentBlock("table")
+TextBlock
+SkeletonBlock("alert")
+ComponentBlock("alert")
+TextBlock
+SkeletonBlock("checkbox")
+ComponentBlock("checkbox")
+```
+
+Your renderer can rely on this invariant for progressive/streaming rendering.
