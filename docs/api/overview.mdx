@@ -1,0 +1,74 @@
+---
+title: "API Overview"
+description: "Direct HTTP integration for custom applications and AI pipelines"
+---
+
+The Outkit REST API lets you enhance AI text responses from any language, framework, or backend. Send raw text in, get structured UI components back.
+
+## Base URL
+
+```
+https://api.outkit.dev
+```
+
+## Authentication
+
+All endpoints require an API key passed in the `x-outkit-api-key` header:
+
+```bash
+curl https://api.outkit.dev/components \
+  -H "x-outkit-api-key: your-api-key"
+```
+
+<Warning>
+  Never expose your API key in client-side code. Call the Outkit API from your backend and forward results to your frontend.
+</Warning>
+
+## Endpoints
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| `POST` | [`/enhance`](/docs/api/enhance) | Transform text into UI components | Required |
+| `GET` | [`/components`](/docs/api/components) | List available component types | Required |
+
+## Response Format
+
+All endpoints return JSON. Successful responses return `200`. Errors return structured JSON with an `error` and `detail` field:
+
+```json
+{
+  "error": "InputTooLargeError",
+  "detail": "Content exceeds maximum allowed size"
+}
+```
+
+### Error Codes
+
+| Status | Error | Meaning |
+|--------|-------|---------|
+| `401` | Unauthorized | Missing or invalid API key |
+| `413` | InputTooLargeError | Content exceeds 512 KB |
+| `429` | RateLimitExceeded | Too many requests — slow down |
+| `502` | ProviderError | LLM processing failed |
+| `503` | ProviderUnavailableError | LLM provider temporarily unavailable |
+| `504` | ProviderTimeoutError | LLM processing timed out |
+
+## Rate Limits
+
+Rate limits depend on your plan:
+
+| Plan | Requests per minute | Max components per response |
+|------|--------------------|-----------------------------|
+| Free | 20 | 3 |
+| Pro | 100 | 8 |
+
+When rate limited, you'll receive a `429` response. Implement exponential backoff in your client.
+
+## Content Limits
+
+- Maximum request body size: **512 KB**
+- Requests exceeding this limit receive a `413` response
+
+## CORS
+
+The API accepts requests from any origin (`Access-Control-Allow-Origin: *`), but you should still route requests through your own backend to protect your API key.

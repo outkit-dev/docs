@@ -1,0 +1,123 @@
+---
+title: "GET /components"
+description: "List available component types"
+---
+
+Returns the component types available for your API key and plan.
+
+## Request
+
+```bash
+curl https://api.outkit.dev/components \
+  -H "x-outkit-api-key: your-api-key"
+```
+
+No request body or parameters required.
+
+## Response
+
+```json
+{
+  "specVersion": "1.0",
+  "components": [
+    {
+      "key": "table",
+      "mcpDetected": true,
+      "description": "Structured data in rows and columns",
+      "complexity": "medium",
+      "plan": "free"
+    },
+    {
+      "key": "card",
+      "mcpDetected": true,
+      "description": "Single entity with structured attributes",
+      "complexity": "low",
+      "plan": "free"
+    },
+    {
+      "key": "alert",
+      "mcpDetected": true,
+      "description": "Warnings, caveats, important notices",
+      "complexity": "low",
+      "plan": "free"
+    },
+    {
+      "key": "checkbox",
+      "mcpDetected": true,
+      "description": "Checklists and to-do items",
+      "complexity": "low",
+      "plan": "free"
+    },
+    {
+      "key": "accordion",
+      "mcpDetected": true,
+      "description": "Collapsible FAQ-style sections",
+      "complexity": "low",
+      "plan": "pro"
+    },
+    {
+      "key": "tabs",
+      "mcpDetected": true,
+      "description": "Parallel alternatives and categories",
+      "complexity": "low",
+      "plan": "pro"
+    },
+    {
+      "key": "steps",
+      "mcpDetected": true,
+      "description": "Numbered processes, workflows, setup guides",
+      "complexity": "low",
+      "plan": "pro"
+    },
+    {
+      "key": "timeline",
+      "mcpDetected": true,
+      "description": "Chronological events and milestones",
+      "complexity": "low",
+      "plan": "pro"
+    },
+    {
+      "key": "chart",
+      "mcpDetected": true,
+      "description": "Numeric data, trends, distributions",
+      "complexity": "medium",
+      "plan": "pro"
+    },
+    {
+      "key": "progress",
+      "mcpDetected": true,
+      "description": "Scores, ratings, completion percentages",
+      "complexity": "low",
+      "plan": "pro"
+    }
+  ]
+}
+```
+
+### Response Fields
+
+<ResponseField name="specVersion" type="string">
+  The Outkit spec version. Currently `"1.0"`.
+</ResponseField>
+
+<ResponseField name="components" type="array">
+  Array of available component types.
+
+  <Expandable title="Component fields">
+    <ResponseField name="key" type="string">
+      The component identifier used in `ContentBlock.component` and in `preferences.preferredTypes`.
+    </ResponseField>
+    <ResponseField name="mcpDetected" type="boolean">
+      Whether this component can be automatically detected by the classifier.
+    </ResponseField>
+    <ResponseField name="description" type="string">
+      When this component type is triggered — what kind of content maps to it.
+    </ResponseField>
+    <ResponseField name="complexity" type="string">
+      Component complexity: `"low"`, `"medium"`, or `"high"`. Higher complexity components may take slightly longer to generate.
+    </ResponseField>
+    <ResponseField name="plan" type="string">
+      The minimum plan required: `"free"` or `"pro"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

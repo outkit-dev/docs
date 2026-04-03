@@ -1,1 +1,56 @@
-{"$schema":"https://mintlify.com/schema.json","name":"Outkit","favicon":"/favicon.png","logo":{"light":"/logo/light.svg","dark":"/logo/dark.svg"},"colors":{"primary":"#000000","light":"#111827","dark":"#ffffff"},"topbarLinks":[{"name":"Website","url":"https://outkit.dev"}],"topbarCtaButton":{"name":"Get Started","url":"https://app.outkit.dev"},"navigation":[{"group":"Getting Started","pages":["docs/introduction","docs/quickstart"]}]}
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "Outkit",
+    "favicon": "/favicon.png",
+    "logo": {
+        "light": "/logo/light.svg",
+        "dark": "/logo/dark.svg"
+    },
+    "colors": {
+        "primary": "#000000",
+        "light": "#111827",
+        "dark": "#ffffff"
+    },
+    "topbarLinks": [
+        {
+            "name": "Website",
+            "url": "https://outkit.dev"
+        }
+    ],
+    "topbarCtaButton": {
+        "name": "Get Started",
+        "url": "https://app.outkit.dev"
+    },
+    "navigation": [
+        {
+            "group": "Getting Started",
+            "pages": [
+                "docs/introduction",
+                "docs/quickstart"
+            ]
+        },
+        {
+            "group": "MCP Server",
+            "pages": [
+                "docs/mcp/overview",
+                "docs/mcp/tools"
+            ]
+        },
+        {
+            "group": "REST API",
+            "pages": [
+                "docs/api/overview",
+                "docs/api/enhance",
+                "docs/api/components",
+                "docs/api/content-blocks"
+            ]
+        },
+        {
+            "group": "Reference",
+            "pages": [
+                "docs/components",
+                "docs/examples"
+            ]
+        }
+    ]
+}

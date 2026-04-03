@@ -1,0 +1,195 @@
+---
+title: "MCP Tools"
+description: "Reference for outkit_enhance and outkit_list_components"
+---
+
+The Outkit MCP server exposes two tools. Your AI assistant calls them automatically when it determines a response would benefit from rich formatting.
+
+## outkit_enhance
+
+Transforms a raw LLM text response into structured UI components. This is the core tool — it analyzes text, detects component-worthy segments (tables, alerts, checklists, etc.), extracts structured props, and returns an ordered array of `ContentBlock[]`.
+
+### Parameters
+
+<ParamField body="content" type="string" required>
+  The full LLM text response to enhance. This is the raw text output from the AI — including any markdown formatting.
+</ParamField>
+
+<ParamField body="context" type="string">
+  The user's original prompt or conversation context. Helps Outkit make better classification decisions — for example, distinguishing a comparison table from a data dump.
+</ParamField>
+
+<ParamField body="preferences" type="string[]">
+  Component types to prefer. Must be valid types from `outkit_list_components`. For example, `["table", "card"]` hints that the response should favor those component types where ambiguous.
+</ParamField>
+
+### Response
+
+Returns a JSON object with two fields:
+
+```json
+{
+  "blocks": [ContentBlock],
+  "debug": {
+    "componentsDetected": 3,
+    "processingTimeMs": 3836,
+    "provider": "gemini",
+    "classifications": [
+      { "component": "table", "confidence": 0.95, "sourceRange": [0, 0] },
+      { "component": "alert", "confidence": 0.90, "sourceRange": [0, 0] }
+    ]
+  }
+}
+```
+
+### Block Types
+
+The `blocks` array contains three types of blocks, always in order:
+
+<AccordionGroup>
+  <Accordion title="TextBlock">
+    Plain text/markdown content that doesn't map to a component.
+
+    ```json
+    {
+      "type": "text",
+      "content": "PostgreSQL and MongoDB are both excellent databases..."
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="SkeletonBlock">
+    A loading placeholder that always precedes its matching `ComponentBlock`. Renderers can show a shimmer/skeleton immediately while waiting for the full component data.
+
+    ```json
+    {
+      "type": "skeleton",
+      "component": "table",
+      "rows": 4
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ComponentBlock">
+    A fully structured UI component with typed props.
+
+    ```json
+    {
+      "type": "component",
+      "component": "table",
+      "version": "1.0",
+      "props": {
+        "columns": ["Feature", "PostgreSQL", "MongoDB"],
+        "rows": [
+          { "Feature": "Data Model", "PostgreSQL": "Relational", "MongoDB": "Document" }
+        ],
+        "sortable": true
+      },
+      "meta": {
+        "confidence": 0.95
+      },
+      "fallback": "| Feature | PostgreSQL | MongoDB |..."
+    }
+    ```
+
+    **Key fields:**
+    - `component` — The component type key (e.g. `table`, `alert`, `checkbox`)
+    - `version` — Schema version, currently `"1.0"`
+    - `props` — Component-specific structured data (see [Components](/docs/components))
+    - `meta.confidence` — How confident the classifier is (0–1)
+    - `fallback` — The original markdown text, used if the component fails to render
+  </Accordion>
+</AccordionGroup>
+
+### Block Ordering Contract
+
+Blocks always follow this pattern:
+
+```
+TextBlock           ← prose before first component
+SkeletonBlock       ← placeholder for upcoming component
+ComponentBlock      ← full component data (same type as skeleton)
+TextBlock           ← prose between components
+SkeletonBlock       ← next placeholder
+ComponentBlock      ← next component
+...
+```
+
+Every `ComponentBlock` is **always preceded** by a matching `SkeletonBlock` of the same type. This enables streaming UX where you show a placeholder immediately while component data loads.
+
+### Example
+
+**Input:**
+```json
+{
+  "content": "Here's a comparison:\n\n| Feature | A | B |\n|---------|---|---|\n| Speed | Fast | Slow |\n\n**Warning:** Option A requires more memory.",
+  "context": "User comparing two tools"
+}
+```
+
+**Output:**
+```json
+{
+  "blocks": [
+    { "type": "text", "content": "Here's a comparison:" },
+    { "type": "skeleton", "component": "table", "rows": 1 },
+    {
+      "type": "component",
+      "component": "table",
+      "version": "1.0",
+      "props": {
+        "columns": ["Feature", "A", "B"],
+        "rows": [{ "Feature": "Speed", "A": "Fast", "B": "Slow" }],
+        "sortable": true
+      },
+      "meta": { "confidence": 0.95 },
+      "fallback": "| Feature | A | B |..."
+    },
+    { "type": "skeleton", "component": "alert" },
+    {
+      "type": "component",
+      "component": "alert",
+      "version": "1.0",
+      "props": {
+        "variant": "warning",
+        "message": "Option A requires more memory."
+      },
+      "meta": { "confidence": 0.90 }
+    }
+  ]
+}
+```
+
+---
+
+## outkit_list_components
+
+Lists all available UI component types. No LLM call — returns instantly. Use this for capability discovery or to validate component type names before passing them as `preferences` to `outkit_enhance`.
+
+### Parameters
+
+None required.
+
+### Response
+
+```json
+{
+  "specVersion": "1.0",
+  "components": [
+    { "name": "table",     "description": "Structured data in rows and columns" },
+    { "name": "card",      "description": "Single entity with structured attributes" },
+    { "name": "alert",     "description": "Warnings, caveats, important notices" },
+    { "name": "checkbox",  "description": "Checklists and to-do items" },
+    { "name": "accordion", "description": "Collapsible FAQ-style sections" },
+    { "name": "tabs",      "description": "Parallel alternatives and categories" },
+    { "name": "progress",  "description": "Scores, ratings, completion percentages" },
+    { "name": "chart",     "description": "Numeric data, trends, distributions" },
+    { "name": "steps",     "description": "Numbered processes and setup guides" },
+    { "name": "timeline",  "description": "Chronological events and milestones" }
+  ]
+}
+```
+
+<Note>
+  The component list depends on your plan. Free plans have access to core components; Pro plans unlock the full catalog of 45+ types.
+</Note>

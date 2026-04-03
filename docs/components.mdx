@@ -1,0 +1,362 @@
+---
+title: "Components"
+description: "All UI component types Outkit can generate"
+---
+
+Outkit can detect and generate 45+ component types from AI text. Each component has a typed `props` schema — structured data your frontend renders as interactive UI.
+
+## Core Components (Free Plan)
+
+These components are available on all plans.
+
+### table
+
+Structured data in rows and columns. Triggered by markdown tables, comparisons, or multi-attribute data.
+
+```json
+{
+  "component": "table",
+  "props": {
+    "columns": ["Framework", "Stars", "Language"],
+    "rows": [
+      { "Framework": "React", "Stars": "220k", "Language": "JavaScript" },
+      { "Framework": "Vue", "Stars": "207k", "Language": "JavaScript" }
+    ],
+    "sortable": true,
+    "caption": "Frontend Framework Comparison"
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `columns` | `string[]` | Column headers |
+| `rows` | `Record<string, string \| number>[]` | Row data keyed by column name |
+| `sortable` | `boolean?` | Enable column sorting (default: `true`) |
+| `highlights` | `Record<string, (string \| number)[]>?` | Column values to emphasize |
+| `caption` | `string?` | Table caption |
+
+### card
+
+Single entity with structured attributes — a person, company, product, or concept.
+
+```json
+{
+  "component": "card",
+  "props": {
+    "heading": "React",
+    "subheading": "Frontend Library",
+    "items": [
+      { "label": "Stars", "value": "220k" },
+      { "label": "Language", "value": "JavaScript" },
+      { "label": "Maintained by", "value": "Meta" }
+    ],
+    "variant": "bordered"
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `heading` | `string?` | Card title |
+| `subheading` | `string?` | Subtitle |
+| `items` | `{label, value, icon?, href?}[]` | Key-value attributes |
+| `footer` | `string?` | Footer text |
+| `variant` | `"default" \| "bordered" \| "elevated"` | Visual style |
+
+### alert
+
+Warnings, caveats, prerequisites, and important notices.
+
+```json
+{
+  "component": "alert",
+  "props": {
+    "variant": "warning",
+    "title": "Breaking Change",
+    "message": "This migration requires downtime. Schedule accordingly."
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `variant` | `"info" \| "warning" \| "error" \| "success" \| "tip"` | Alert type |
+| `title` | `string?` | Alert heading |
+| `message` | `string` | Alert body text |
+| `items` | `string[]?` | Bullet points within the alert |
+| `dismissible` | `boolean?` | Allow user to dismiss |
+
+### checkbox
+
+Checklists, to-do items, and step-by-step completion tracking.
+
+```json
+{
+  "component": "checkbox",
+  "props": {
+    "title": "Setup Checklist",
+    "items": [
+      { "id": "deps", "label": "Install dependencies" },
+      { "id": "env", "label": "Configure environment variables" },
+      { "id": "db", "label": "Run database migrations" }
+    ],
+    "showProgress": true
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `title` | `string?` | Checklist title |
+| `items` | `{id, label, description?, checked?}[]` | Checklist items |
+| `showProgress` | `boolean?` | Show completion progress bar |
+
+---
+
+## Extended Components (Pro Plan)
+
+These components are available on Pro plans.
+
+### accordion
+
+Collapsible FAQ-style sections. Triggered by Q&A patterns, definitions, or grouped explanations.
+
+```json
+{
+  "component": "accordion",
+  "props": {
+    "items": [
+      { "id": "q1", "title": "What is Outkit?", "content": "Outkit transforms AI text..." },
+      { "id": "q2", "title": "How does pricing work?", "content": "We offer free and pro plans..." }
+    ],
+    "type": "single"
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `items` | `{id, title, content, defaultOpen?, icon?}[]` | Sections |
+| `type` | `"single" \| "multiple"` | Allow one or many open at once |
+| `collapsible` | `boolean?` | Allow closing all sections |
+
+### tabs
+
+Parallel alternatives, language-specific code examples, or category views.
+
+```json
+{
+  "component": "tabs",
+  "props": {
+    "tabs": [
+      { "id": "python", "label": "Python", "content": "```python\nimport requests\n```" },
+      { "id": "node", "label": "Node.js", "content": "```js\nfetch('...')\n```" }
+    ],
+    "variant": "underline"
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `tabs` | `{id, label, icon?, content}[]` | Tab panels |
+| `defaultTab` | `string?` | ID of initially active tab |
+| `variant` | `"underline" \| "pills" \| "outline"` | Visual style |
+
+### steps
+
+Numbered processes, workflows, and setup guides.
+
+```json
+{
+  "component": "steps",
+  "props": {
+    "items": [
+      { "title": "Install", "content": "Run `npm install @outkit/react`" },
+      { "title": "Configure", "content": "Add your API key to `.env`" },
+      { "title": "Render", "content": "Replace `<Markdown>` with `<AIRenderer>`" }
+    ]
+  }
+}
+```
+
+### timeline
+
+Chronological events, milestones, and version history.
+
+```json
+{
+  "component": "timeline",
+  "props": {
+    "items": [
+      { "date": "2024-01", "title": "v1.0 Launch", "content": "Initial release" },
+      { "date": "2024-06", "title": "v2.0", "content": "Added streaming support" }
+    ]
+  }
+}
+```
+
+### progress
+
+Scores, ratings, skill levels, and completion percentages.
+
+```json
+{
+  "component": "progress",
+  "props": {
+    "items": [
+      { "label": "JavaScript", "value": 90, "color": "success" },
+      { "label": "Python", "value": 75, "color": "default" },
+      { "label": "Rust", "value": 40, "color": "warning" }
+    ],
+    "showValue": true,
+    "size": "md"
+  }
+}
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `items` | `{label, value, maxLabel?, color?}[]` | Progress bars |
+| `showValue` | `boolean?` | Display percentage values |
+| `size` | `"sm" \| "md" \| "lg"` | Bar size |
+
+### Charts
+
+Outkit supports multiple chart types for numeric data, trends, and distributions.
+
+<AccordionGroup>
+  <Accordion title="line — Line Chart">
+    Trends over time, growth metrics, performance data.
+
+    ```json
+    {
+      "component": "line",
+      "props": {
+        "data": {
+          "labels": ["Jan", "Feb", "Mar", "Apr"],
+          "datasets": [
+            { "label": "Revenue", "values": [100, 150, 130, 200] }
+          ]
+        },
+        "xAxis": { "label": "Month" },
+        "yAxis": { "label": "Revenue ($k)" }
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="bar — Bar Chart">
+    Category comparisons, rankings, survey results.
+
+    ```json
+    {
+      "component": "bar",
+      "props": {
+        "data": {
+          "labels": ["React", "Vue", "Svelte"],
+          "datasets": [
+            { "label": "GitHub Stars (k)", "values": [220, 207, 78] }
+          ]
+        },
+        "stacked": false
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="pie — Pie Chart">
+    Part-to-whole proportions, market share, percentage breakdowns.
+
+    ```json
+    {
+      "component": "pie",
+      "props": {
+        "data": {
+          "labels": ["Chrome", "Safari", "Firefox", "Other"],
+          "datasets": [
+            { "label": "Market Share", "values": [65, 19, 8, 8] }
+          ]
+        },
+        "legend": true
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="area — Area Chart">
+    Volume and cumulative data, stacked distributions.
+  </Accordion>
+  <Accordion title="radar — Radar Chart">
+    Multi-attribute comparisons, skill assessments.
+  </Accordion>
+  <Accordion title="radial — Radial Chart">
+    Progress toward goals, KPI gauges, completion metrics.
+  </Accordion>
+</AccordionGroup>
+
+All chart types share a common props structure:
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `data.labels` | `string[]` | Axis labels or category names |
+| `data.datasets` | `{label, values, color?}[]` | Data series |
+| `xAxis` | `{label?, type?}?` | X-axis configuration |
+| `yAxis` | `{label?, min?, max?}?` | Y-axis configuration |
+| `legend` | `boolean?` | Show legend |
+| `stacked` | `boolean?` | Stack multiple datasets |
+
+### More Components
+
+<CardGroup cols={2}>
+  <Card title="proscons">
+    Advantages vs disadvantages comparisons
+  </Card>
+  <Card title="diff">
+    Code changes, before/after, patch-style diffs
+  </Card>
+  <Card title="metadata">
+    Structured metadata lists, search results
+  </Card>
+  <Card title="collapsible">
+    Single expandable section, "show more" content
+  </Card>
+  <Card title="callout">
+    Highlighted excerpts, quotes, key insights
+  </Card>
+  <Card title="banner">
+    Meta warnings, disclaimers, system messages
+  </Card>
+  <Card title="gallery">
+    Multiple images, screenshots, diagrams
+  </Card>
+  <Card title="badge">
+    Status badges, tags, labels
+  </Card>
+  <Card title="compare">
+    Side-by-side technology/product comparisons
+  </Card>
+  <Card title="tree">
+    Branching decision flows, troubleshooting
+  </Card>
+  <Card title="form">
+    Multi-field forms, surveys, follow-up questions
+  </Card>
+  <Card title="json">
+    Raw JSON viewer, API responses, collapsible tree
+  </Card>
+  <Card title="quiz">
+    Knowledge checks, trivia, assessments
+  </Card>
+  <Card title="calc">
+    Estimators, ROI calculators, loan calculators
+  </Card>
+  <Card title="embed">
+    YouTube, CodePen, Figma embeds
+  </Card>
+  <Card title="countdown">
+    Deadlines, time-limited events
+  </Card>
+</CardGroup>
+
+<Note>
+  The full list of available components depends on your plan. Use the [`GET /components`](/docs/api/components) endpoint or the `outkit_list_components` MCP tool to see what's available for your account.
+</Note>

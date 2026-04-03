@@ -1,0 +1,137 @@
+---
+title: "Examples"
+description: "Real-world input/output examples"
+---
+
+See how Outkit transforms different types of AI responses into structured components.
+
+## Database Comparison
+
+A user asks: *"Compare PostgreSQL and MongoDB for my e-commerce startup and tell me what I need to set up PostgreSQL"*
+
+**Raw AI output** (markdown):
+```markdown
+PostgreSQL and MongoDB are both excellent databases, but they serve
+different needs for an e-commerce platform.
+
+| Feature | PostgreSQL | MongoDB |
+|---------|-----------|---------|
+| Data Model | Relational | Document |
+| ACID | Full | Multi-doc since 4.0 |
+| Horizontal Scaling | Limited (Citus) | Native sharding |
+| Best For | Transactions, analytics | Catalogs, content |
+
+**Important:** If you're handling payments, PostgreSQL's ACID guarantees
+are non-negotiable.
+
+Here's what you need to set up PostgreSQL:
+1. Install PostgreSQL 16
+2. Configure pg_hba.conf for authentication
+3. Create your database and roles
+4. Set up connection pooling with PgBouncer
+5. Configure automated backups
+6. Set up monitoring with pg_stat_statements
+```
+
+**Outkit output** (3 components detected in ~3.8s):
+
+```json
+{
+  "blocks": [
+    {
+      "type": "text",
+      "content": "PostgreSQL and MongoDB are both excellent databases, but they serve different needs for an e-commerce platform."
+    },
+    {
+      "type": "skeleton",
+      "component": "table",
+      "rows": 4
+    },
+    {
+      "type": "component",
+      "component": "table",
+      "version": "1.0",
+      "props": {
+        "columns": ["Feature", "PostgreSQL", "MongoDB"],
+        "rows": [
+          { "Feature": "Data Model", "PostgreSQL": "Relational", "MongoDB": "Document" },
+          { "Feature": "ACID", "PostgreSQL": "Full", "MongoDB": "Multi-doc since 4.0" },
+          { "Feature": "Horizontal Scaling", "PostgreSQL": "Limited (Citus)", "MongoDB": "Native sharding" },
+          { "Feature": "Best For", "PostgreSQL": "Transactions, analytics", "MongoDB": "Catalogs, content" }
+        ],
+        "sortable": true
+      },
+      "meta": { "confidence": 0.95 }
+    },
+    {
+      "type": "skeleton",
+      "component": "alert"
+    },
+    {
+      "type": "component",
+      "component": "alert",
+      "version": "1.0",
+      "props": {
+        "variant": "warning",
+        "title": "Payment Data Integrity",
+        "message": "If you're handling payments, PostgreSQL's ACID guarantees are non-negotiable. MongoDB's eventual consistency model can lead to data integrity issues in financial transactions."
+      },
+      "meta": { "confidence": 0.90 }
+    },
+    {
+      "type": "text",
+      "content": "Here's what you need to set up PostgreSQL:"
+    },
+    {
+      "type": "skeleton",
+      "component": "checkbox"
+    },
+    {
+      "type": "component",
+      "component": "checkbox",
+      "version": "1.0",
+      "props": {
+        "title": "PostgreSQL Setup Checklist",
+        "items": [
+          { "id": "install", "label": "Install PostgreSQL 16" },
+          { "id": "auth", "label": "Configure pg_hba.conf for authentication" },
+          { "id": "db", "label": "Create your database and roles" },
+          { "id": "pool", "label": "Set up connection pooling with PgBouncer" },
+          { "id": "backup", "label": "Configure automated backups" },
+          { "id": "monitor", "label": "Set up monitoring with pg_stat_statements" }
+        ],
+        "showProgress": true
+      },
+      "meta": { "confidence": 0.95 }
+    }
+  ]
+}
+```
+
+**What happened:**
+- The markdown table became a structured, sortable `table` component
+- The bold warning became a `warning` alert with a clear title
+- The numbered list became an interactive `checkbox` checklist with progress tracking
+- Prose text was preserved as `text` blocks between components
+
+---
+
+## Streaming Response
+
+Streaming lets you render progressively. Here's how SSE events arrive:
+
+```
+data: {"type":"text","content":"Here are the results:"}
+
+data: {"type":"skeleton","component":"table","rows":3}
+
+data: {"type":"component","component":"table","version":"1.0","props":{"columns":["Name","Score"],"rows":[{"Name":"Alice","Score":95},{"Name":"Bob","Score":87}]}}
+
+data: [DONE]
+```
+
+**Rendering timeline:**
+1. `text` arrives → render "Here are the results:" immediately
+2. `skeleton` arrives → show a table-shaped loading placeholder
+3. `component` arrives → swap the placeholder with the full interactive table
+4. `[DONE]` → stream complete
